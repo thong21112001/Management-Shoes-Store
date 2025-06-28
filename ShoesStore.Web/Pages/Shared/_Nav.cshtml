@@ -1,11 +1,42 @@
-﻿<ul class="navbar-nav flex-grow-1">
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="" asp-page="/Categories/Index">Categories</a>
-    </li>
-</ul>
+﻿<nav class="navbar navbar-expand-lg bg-body-tertiary rounded-3 mb-4 p-2 shadow-sm">
+    <div class="container-fluid">
+        <!-- Mobile Sidebar Toggle -->
+        <button class="btn btn-light d-lg-none" type="button" id="mobile-sidebar-toggle">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- Desktop Sidebar Toggle (Moved Here) -->
+        <button class="btn btn-light sidebar-toggle-btn d-none d-lg-block" type="button"
+                id="desktop-sidebar-toggle">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <!-- Search Form (Hidden on Mobile) -->
+        <form class="d-none d-lg-flex ms-3" role="search">
+            <input class="form-control me-2" type="search" placeholder="Tìm kiếm..." aria-label="Search">
+        </form>
+
+        <!-- Right Aligned Items -->
+        <div class="d-flex align-items-center ms-auto">
+            <button class="btn btn-toggle-theme me-3" id="theme-toggle">
+                <i class="fa-solid fa-sun" id="theme-icon-sun"></i>
+                <i class="fa-solid fa-moon d-none" id="theme-icon-moon"></i>
+            </button>
+            <div class="dropdown">
+                <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://placehold.co/32x32/EFEFEF/AAAAAA?text=A" alt="mdo" width="32" height="32"
+                         class="rounded-circle">
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end text-small">
+                    <li><a class="dropdown-item" href="#">Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="#">Cài đặt</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
