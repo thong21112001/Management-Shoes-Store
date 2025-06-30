@@ -1,23 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using ShoesStore.Application.Common.Interfaces;
-using ShoesStore.Domain.Entities.Data;
+using ShoesStore.Application.DTOs;
 
 namespace ShoesStore.Web.Pages.Categories
 {
     public class IndexModel : PageModel
     {
-        private readonly ICategoryRepository categoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
         public IndexModel(ICategoryRepository category)
         {
-            categoryRepository = category;
+            _categoryRepository = category;
         }
 
-        public IEnumerable<Category> Categories { get; set; } = new List<Category>();
+        public IList<CategoriesDto> Categories { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Categories = await categoryRepository.GetAllAsync();
+            if (_categoryRepository != null)
+            {
+                Categories = await _categoryRepository.GetAllAsync();
+            }
+            else
+            {
+                Categories = new List<CategoriesDto>();
+            }
         }
     }
 }
