@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using ShoesStore.Application.Common.Interfaces;
+using ShoesStore.Application.DTOs;
 using ShoesStore.Domain.Entities.Data;
 using ShoesStore.Infrastructure.Persistence.Data;
 
@@ -8,17 +11,22 @@ namespace ShoesStore.Infrastructure.Persistence.Repositories
     public class CategoryRepository : ICategoryRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CategoryRepository(ApplicationDbContext context)
+        public CategoryRepository(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         //Index categories by Id, Name, and Description
-        public async Task<IEnumerable<Category>> GetAllAsync()
+        public async Task<IList<CategoriesDto>> GetAllAsync()
         {
             // sử dụng AsNoTracking để tránh việc theo dõi các thay đổi của thực thể, giúp cải thiện hiệu suất khi chỉ cần đọc dữ liệu
-            return await _context.Categories.AsNoTracking().ToListAsync();
+            return await _context.Categories
+                                .AsNoTracking()
+                                .ProjectTo<CategoriesDto>(_mapper.ConfigurationProvider)
+                                .ToListAsync();
         }
 
         // Get category by Id

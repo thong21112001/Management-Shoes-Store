@@ -1,4 +1,8 @@
-﻿#myTable_wrapper {
+﻿th {
+    border: none !important;
+}
+
+#myTable_wrapper {
     min-height: 400px;
 }
 
@@ -11,14 +15,12 @@
     align-items: center;
 }
 
- Đổi dt-footer thành flex-column 
 .dt-footer {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
 }
 
- Mỗi phần wrap thành full-width 
 .dt-info,
 .dt-paginate {
     width: 100%;
@@ -29,7 +31,6 @@
     width: 100% !important;
 }
 
- scrollbar chỉ ở body 
 .dataTables_scrollBody {
     overflow-x: auto !important;
 }
