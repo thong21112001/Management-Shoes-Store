@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --sidebar-width: 280px;
     --sidebar-width-collapsed: 88px;
     --transition-speed: 0.3s;
@@ -9,6 +9,16 @@ body {
     background-color: var(--bs-tertiary-bg);
     color: var(--bs-body-color);
     transition: padding-left var(--transition-speed) ease;
+}
+
+body.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+body.fade-in {
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .sidebar {
@@ -196,7 +206,7 @@ body.sidebar-collapsed .sidebar-toggle-btn {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1040; /* Adjusted z-index */
+    z-index: 1040;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -206,14 +216,6 @@ body.sidebar-collapsed .sidebar-toggle-btn {
     opacity: 1;
     visibility: visible;
 }
-
-/*.content-section {
-    display: none;
-}
-
-.content-section.active {
-    display: block;
-}*/
 
 /* --- Mobile Responsive (REWORKED) --- */
 @media (max-width: 991.98px) {
@@ -230,7 +232,7 @@ body.sidebar-collapsed .sidebar-toggle-btn {
 
     .sidebar {
         transform: translateX(-100%);
-        z-index: 1045; /* Ensure sidebar is above backdrop and navbar */
+        z-index: 1045;
     }
 
     .sidebar.active {
