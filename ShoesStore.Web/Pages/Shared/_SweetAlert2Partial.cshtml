@@ -1,0 +1,7 @@
+﻿@using Newtonsoft.Json
+@{
+    var alertsJson = TempData["Alerts"] as string ?? "[]";
+}
+<div id="alert-data" data-alerts='@Html.Raw(alertsJson)'></div>
+
+<script src="~/js/sweetalert2/sweetalertconfig.js"></script>

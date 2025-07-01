@@ -1,61 +1,67 @@
-﻿<div class="sidebar d-flex flex-column p-0" id="sidebar">
-    <div class="sidebar-header">
-        <a href="#" class="d-flex align-items-center">
-            <i class="fa-solid fa-store me-2 text-primary"></i>
-            <span class="logo-text">Shoes Store</span>
-        </a>
-    </div>
+﻿@functions {
+    bool IsActive(string matchPath)
+    {
+        var currentPath = Context.Request.Path.Value?.ToLowerInvariant() ?? "";
+        matchPath = matchPath.ToLowerInvariant();
+        return currentPath == matchPath || currentPath.StartsWith(matchPath + "/");
+    }
+}
 
-    <ul class="nav flex-column flex-grow-1 mt-3">
-        <li class="nav-item">
-            <a class="nav-link active" href="/Index">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span class="nav-link-text">Bảng điều khiển</span>
-            </a>
-        </li>
+<div class="sidebar d-flex flex-column p-0" id="sidebar">  
+    <div class="sidebar-header">  
+        <a href="#" class="d-flex align-items-center">  
+            <i class="fa-solid fa-store me-2 text-primary"></i>  
+            <span class="logo-text">Shoes Store</span>  
+        </a>  
+    </div>  
 
-        <li class="nav-item">
-            <a class="nav-link" asp-area="" asp-page="/Categories/Index" title="Danh mục giày">
-                <i class="fa-solid fa-folder-open"></i>
-                <span class="nav-link-text">Danh mục giày</span>
-            </a>
-        </li>
+    <ul class="nav flex-column flex-grow-1 mt-3">  
+        <li class="nav-item">  
+            <a class="nav-link @(IsActive("/index") ? "active" : "")" href="/Index">
+                <i class="fa-solid fa-chart-pie"></i>  
+                <span class="nav-link-text">Bảng điều khiển</span>  
+            </a>  
+        </li>  
 
-        <li class="nav-item">
-            <a class="nav-link" href="#productsCollapse" data-bs-toggle="collapse" role="button"
-               aria-expanded="false" aria-controls="productsCollapse">
-                <i class="fa-solid fa-box-archive"></i>
-                <span class="nav-link-text">Quản lý sản phẩm</span>
-            </a>
-            <div class="collapse" id="productsCollapse">
-                <ul class="nav flex-column nav-submenu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fa-solid fa-list"></i>
-                            <span class="nav-link-text">Tất cả sản phẩm</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                            <i class="fa-solid fa-plus"></i>
-                            <span class="nav-link-text">Thêm sản phẩm</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fa-solid fa-tags"></i>
-                            <span class="nav-link-text">Danh mục</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </li>
+        <li class="nav-item">  
+            <a class="nav-link @(IsActive("/categories") ? "active" : "")" asp-area="" asp-page="/Categories/Index" title="Danh mục giày">
+                <i class="fa-solid fa-folder-open"></i>  
+                <span class="nav-link-text">Danh mục giày</span>  
+            </a>  
+        </li>  
 
+        <li class="nav-item">  
+            <a class="nav-link" href="#productsCollapse" data-bs-toggle="collapse" role="button"  
+               aria-expanded="false" aria-controls="productsCollapse">  
+                <i class="fa-solid fa-box-archive"></i>  
+                <span class="nav-link-text">Quản lý sản phẩm</span>  
+            </a>  
+            <div class="collapse" id="productsCollapse">  
+                <ul class="nav flex-column nav-submenu">  
+                    <li class="nav-item">  
+                        <a class="nav-link" href="#">  
+                            <i class="fa-solid fa-list"></i>  
+                            <span class="nav-link-text">Tất cả sản phẩm</span>  
+                        </a>  
+                    </li>  
+                    <li class="nav-item">  
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addProductModal">  
+                            <i class="fa-solid fa-plus"></i>  
+                            <span class="nav-link-text">Thêm sản phẩm</span>  
+                        </a>  
+                    </li>  
+                    <li class="nav-item">  
+                        <a class="nav-link" href="#">  
+                            <i class="fa-solid fa-tags"></i>  
+                            <span class="nav-link-text">Danh mục</span>  
+                        </a>  
+                    </li>  
+                </ul>  
+            </div>  
+        </li>  
+    </ul>  
 
-        
-    </ul>
-
-    <div class="p-3 mt-auto border-top">
-        <small class="text-muted">© 2025 shoes store</small>
-    </div>
+    <div class="p-3 mt-auto border-top">  
+        <small class="text-muted">© 2025 shoes store</small>  
+    </div>  
 </div>

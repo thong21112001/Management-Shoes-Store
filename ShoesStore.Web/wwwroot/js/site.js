@@ -190,38 +190,38 @@
     });
 
     // 7. Tự động highlight menu theo URL thực tế
-    const currentPath = window.location.pathname.toLowerCase();
+    //const currentPath = window.location.pathname.toLowerCase();
 
-    document.querySelectorAll('.sidebar .nav-link[href]').forEach((link) => {
-        const href = link.getAttribute('href').toLowerCase();
-        if (href && currentPath.includes(href)) {
-            // Xóa active cũ
-            document.querySelectorAll('.sidebar .nav-link.active')
-                .forEach((l) => l.classList.remove('active'));
+    //document.querySelectorAll('.sidebar .nav-link[href]').forEach((link) => {
+    //    const href = link.getAttribute('href').toLowerCase();
+    //    if (href && currentPath.includes(href)) {
+    //        // Xóa active cũ
+    //        document.querySelectorAll('.sidebar .nav-link.active')
+    //            .forEach((l) => l.classList.remove('active'));
 
-            // Thêm active cho link hiện tại
-            link.classList.add('active');
+    //        // Thêm active cho link hiện tại
+    //        link.classList.add('active');
 
-            // Thêm active cho menu cha nếu có
-            const parentCollapse = link.closest('.collapse');
-            if (parentCollapse) {
-                const parentLink = document.querySelector(
-                    `a[href="#${parentCollapse.id}"]`
-                );
-                if (parentLink) parentLink.classList.add('active');
+    //        // Thêm active cho menu cha nếu có
+    //        const parentCollapse = link.closest('.collapse');
+    //        if (parentCollapse) {
+    //            const parentLink = document.querySelector(
+    //                `a[href="#${parentCollapse.id}"]`
+    //            );
+    //            if (parentLink) parentLink.classList.add('active');
 
-                // Mở submenu nếu đang collapsed
-                parentCollapse.classList.add('show');
-            }
-        }
-    });
+    //            // Mở submenu nếu đang collapsed
+    //            parentCollapse.classList.add('show');
+    //        }
+    //    }
+    //});
 
     // --- 8. Chuyển trang mượt - CẢI THIỆN ĐỂ KHÔNG BỊ GIẬT ---
     // Thêm class cho body khi trang load
     document.body.classList.add("fade-in");
 
     // Xử lý chuyển trang nội bộ
-    document.querySelectorAll("a[href]:not([target]):not([data-bs-toggle]):not([href^='#']):not([href^='http'])").forEach(link => {
+    document.querySelectorAll("main a[href]:not([target]):not([data-bs-toggle]):not([href^='#']):not([href^='http'])").forEach(link => {
         const href = link.getAttribute("href");
         if (href && href !== '#' && !href.startsWith("javascript:")) {
             link.addEventListener("click", function (e) {

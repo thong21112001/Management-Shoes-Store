@@ -30,7 +30,7 @@
                         <th>
                             @Html.DisplayNameFor(model => model.Categories[0].Name)
                         </th>
-                        <th>
+                        <th class="d-none d-md-table-cell">
                             @Html.DisplayNameFor(model => model.Categories[0].Description)
                         </th>
                         <th class="no-sort">
@@ -44,10 +44,10 @@
                         <tr>
                             <td></td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Name)
+                                @(item.Name?.Length > 30 ? item.Name.Substring(0,30) + "..." : item.Name)
                             </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Description)
+                            <td class="d-none d-md-table-cell">
+                                @(item.Description?.Length > 30 ? item.Description.Substring(0, 30) + "..." : item.Description)
                             </td>
                             <td>
                                 <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm mt-1">
@@ -81,4 +81,5 @@
           });
         });
     </script>
+    @await Html.PartialAsync("_SweetAlert2Partial")
 }
