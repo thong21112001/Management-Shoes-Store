@@ -142,7 +142,7 @@ body.sidebar-collapsed .sidebar {
     width: var(--sidebar-width-collapsed);
 }
 
-body.sidebar-collapsed .main-content {
+html body.sidebar-collapsed .main-content {
     margin-left: var(--sidebar-width-collapsed);
     width: calc(100% - var(--sidebar-width-collapsed));
 }
