@@ -1,8 +1,8 @@
 ﻿@page
-@model ShoesStore.Web.Pages.Categories.EditModel
+@model ShoesStore.Web.Pages.Brands.EditModel
 
 @{
-    ViewData["Title"] = "Chỉnh sửa danh mục giày";
+    ViewData["Title"] = "Chỉnh sửa thương hiệu giày";
 }
 
 <div class="content-section">
@@ -14,21 +14,22 @@
                 <div class="col-md-12">
                     <form method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="Category.Id" />
-                        <input type="hidden" asp-for="Category.CreatedAt" />
-                        <input type="hidden" asp-for="Category.ImageUrl" />
+                        <input type="hidden" asp-for="Brand.Id" />
+                        <input type="hidden" asp-for="Brand.CreatedAt" />
+                        <input type="hidden" asp-for="Brand.LogoUrl" />
+
 
                         <div class="row">
                             <div class="form-group col-md-4 mb-3">
-                                <label asp-for="Category.Name" class="control-label"></label><span style="color:red">&nbsp*</span>
-                                <input asp-for="Category.Name" class="form-control" />
-                                <span asp-validation-for="Category.Name" class="text-danger"></span>
+                                <label asp-for="Brand.Name" class="control-label"></label><span style="color:red">&nbsp*</span>
+                                <input asp-for="Brand.Name" class="form-control" />
+                                <span asp-validation-for="Brand.Name" class="text-danger"></span>
                             </div>
 
                             <div class="form-group col-md-4 mb-3">
-                                <label asp-for="Category.Description" class="control-label"></label>
-                                <input asp-for="Category.Description" class="form-control" />
-                                <span asp-validation-for="Category.Description" class="text-danger"></span>
+                                <label asp-for="Brand.Description" class="control-label"></label>
+                                <input asp-for="Brand.Description" class="form-control" />
+                                <span asp-validation-for="Brand.Description" class="text-danger"></span>
                             </div>
 
                             <div class="form-group col-md-4 mb-3">
@@ -39,24 +40,24 @@
 
                         <div class="row">
                             <div class="form-group col-md-4 mb-3">
-                                @if (Model.Category.ImageUrl != null && Model.Category.ImageUrl.Length > 0)
+                                @if (Model.Brand.LogoUrl != null && Model.Brand.LogoUrl.Length > 0)
                                 {
-                                    <label>Ảnh hiện tại</label>
+                                    <label>Logo hiện tại</label>
                                     <div>
                                         <img id="preview"
-                                             src="@(Model.Category.ImageRenderedUrl)"
+                                             src="@(Model.Brand.ImageRenderedUrl)"
                                              alt="preview" class="img-thumbnail"
                                              style="max-width: 100%; height: 150px;" />
                                     </div>
                                 }
                                 else
                                 {
-                                    <label>Cập nhập ảnh</label>
+                                    <label>Cập nhập Logo</label>
                                     <img id="preview"
-                                            src="https://placehold.co/300x200/E8F5E8/7cb342?text=Chọn+ảnh"
-                                            alt="preview"
-                                            class="img-thumbnail"
-                                            style="max-width: 100%; height: 150px;" />
+                                         src="https://placehold.co/300x200/E8F5E8/7cb342?text=Chọn+logo"
+                                         alt="preview"
+                                         class="img-thumbnail"
+                                         style="max-width: 100%; height: 150px;" />
                                 }
                             </div>
                         </div>
@@ -75,8 +76,6 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/previewimage/preview-image.js"></script>
 }

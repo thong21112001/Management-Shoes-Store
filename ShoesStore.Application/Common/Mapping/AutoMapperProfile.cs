@@ -9,6 +9,7 @@ namespace ShoesStore.Application.Common.Mapping
         public AutoMapperProfile()
         {
             CreateMap<Category, CategoriesDto>();
+            CreateMap<Brand, BrandsDto>();
         }
     }
 }

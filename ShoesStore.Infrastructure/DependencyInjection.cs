@@ -16,6 +16,7 @@ namespace ShoesStore.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
 
 
             return services;

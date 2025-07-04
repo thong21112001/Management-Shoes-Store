@@ -32,7 +32,7 @@ namespace ShoesStore.Infrastructure.Persistence.Repositories
         // Get category by Id
         public async Task<Category?> GetByIdAsync(int id)
         {
-            return await _context.Categories.AsNoTracking().FirstAsync(c => c.Id == id);
+            return await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
         }
 
         // Add a new category

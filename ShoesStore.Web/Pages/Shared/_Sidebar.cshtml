@@ -57,35 +57,29 @@
             </a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link @(IsActive("/categories") ? "active" : "")" asp-area="" asp-page="/Categories/Index" title="Danh mục giày">
-                <i class="fa-solid fa-folder-open"></i>
-                <span class="nav-link-text">Danh mục giày</span>
-            </a>
-        </li>
-
         @{
             // Xác định xem menu "Quản lý sản phẩm" có nên active và mở rộng hay không
-            var isProductsParentActive = IsParentActive("/products", "/brands", "/suppliers");
+            var isProductsParentActive = IsParentActive("/brands", "/categories");
         }
         <li class="nav-item">
             <a class="nav-link @(isProductsParentActive ? "active" : "")" href="#productsCollapse" data-bs-toggle="collapse" role="button"
                aria-expanded="@(isProductsParentActive ? "true" : "false")" aria-controls="productsCollapse">
                 <i class="fa-solid fa-box-archive"></i>
-                <span class="nav-link-text">Quản lý sản phẩm</span>
+                <span class="nav-link-text">Quản lý</span>
             </a>
+
             <div class="collapse @(isProductsParentActive ? "show" : "")" id="productsCollapse">
                 <ul class="nav flex-column nav-submenu">
                     <li class="nav-item">
-                        <a class="nav-link @(IsActive("/products") ? "active" : "")" href="#!">
+                        <a class="nav-link @(IsActive("/brands") ? "active" : "")" href="/Brands/Index" title="Thương hiệu giày">
                             <i class="fa-solid fa-list"></i>
-                            <span class="nav-link-text">Tất cả sản phẩm</span>
+                            <span class="nav-link-text">Thương hiệu giày</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(IsActive("/brands") ? "active" : "")" href="#!">
-                            <i class="fa-solid fa-tags"></i>
-                            <span class="nav-link-text">Thương hiệu</span>
+                        <a class="nav-link @(IsActive("/categories") ? "active" : "")" href="/Categories/Index" title="Danh mục giày">
+                            <i class="fa-solid fa-list"></i>
+                            <span class="nav-link-text">Danh mục giày</span>
                         </a>
                     </li>
                 </ul>

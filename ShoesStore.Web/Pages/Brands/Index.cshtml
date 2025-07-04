@@ -1,8 +1,8 @@
 ﻿@page
-@model ShoesStore.Web.Pages.Categories.IndexModel
+@model ShoesStore.Web.Pages.Brands.IndexModel
 
 @{
-    ViewData["Title"] = "Danh mục";
+    ViewData["Title"] = "Thương hiệu";
 }
 
 @section Styles {
@@ -12,7 +12,7 @@
 @Html.AntiForgeryToken()
 
 <div class="content-section">
-    <h2>Danh mục giày</h2>
+    <h2>Thương hiệu giày</h2>
 
     <div class="card shadow-sm mt-4">
         <div class="card-body">
@@ -29,10 +29,10 @@
                             STT
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.Categories[0].Name)
+                            @Html.DisplayNameFor(model => model.Brand[0].Name)
                         </th>
                         <th class="d-none d-md-table-cell">
-                            @Html.DisplayNameFor(model => model.Categories[0].Description)
+                            @Html.DisplayNameFor(model => model.Brand[0].Description)
                         </th>
                         <th class="no-sort">
                             Thao tác
@@ -40,12 +40,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Categories)
+                    @foreach (var item in Model.Brand)
                     {
                         <tr>
                             <td></td>
                             <td>
-                                @(item.Name?.Length > 30 ? item.Name.Substring(0,30) + "..." : item.Name)
+                                @(item.Name?.Length > 30 ? item.Name.Substring(0, 30) + "..." : item.Name)
                             </td>
                             <td class="d-none d-md-table-cell">
                                 @(item.Description?.Length > 30 ? item.Description.Substring(0, 30) + "..." : item.Description)
@@ -73,7 +73,7 @@
 
 @section Scripts {
     <script src="~/js/datatables/datatablesconfig.js"></script>
-    <script src="~/js/pages/categories/management-del-details.js"></script>
+    <script src="~/js/pages/brands/management-del-details.js"></script>
     <script>
         $(function() {
           initDataTable("#myTable", {
