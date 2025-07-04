@@ -10,6 +10,8 @@
     <link href="~/css/datatables/datatablescss.css" rel="stylesheet" />
 }
 
+@Html.AntiForgeryToken()
+
 <div class="content-section">
     <h2>Danh mục giày</h2>
 
@@ -53,10 +55,10 @@
                                 <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm mt-1">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm mt-1">
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary btn-sm mt-1" onclick="showDetails(@item.Id)">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm mt-1">
+                                <a href="javascript:void(0);" class="btn btn-outline-danger btn-sm mt-1" onclick="showDeleteConfirm(@item.Id)">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </td>
@@ -68,8 +70,11 @@
     </div>
 </div>
 
+<partial name="_ModalDelDeatailsPartial" />
+
 @section Scripts {
     <script src="~/js/datatables/datatablesconfig.js"></script>
+    <script src="~/js/pages/categories/management-del-details.js"></script>
     <script>
         $(function() {
           initDataTable("#myTable", {

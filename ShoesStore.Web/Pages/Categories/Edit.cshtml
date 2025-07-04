@@ -2,64 +2,82 @@
 @model ShoesStore.Web.Pages.Categories.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Chỉnh sửa danh mục giày";
 }
 
-<h3>Edit category</h3>
 
-<hr />
+<div class="content-section">
+    <h3>@ViewData["Title"]</h3>
 
-<div class="row">
-    <div class="col-md-12">
-        <form method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Category.Id" />
-            <input type="hidden" asp-for="Category.CreatedAt" />
-            <input type="hidden" asp-for="Category.ImageUrl" />
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <form method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Category.Id" />
+                        <input type="hidden" asp-for="Category.CreatedAt" />
+                        <input type="hidden" asp-for="Category.ImageUrl" />
 
-            <div class="row mb-3">
-                <div class="form-group col-md-4">
-                    <label asp-for="Category.Name" class="control-label"></label>
-                    <input asp-for="Category.Name" class="form-control" />
-                    <span asp-validation-for="Category.Name" class="text-danger"></span>
-                </div>
+                        <div class="row">
+                            <div class="form-group col-md-4 mb-3">
+                                <label asp-for="Category.Name" class="control-label"></label><span style="color:red">&nbsp*</span>
+                                <input asp-for="Category.Name" class="form-control" />
+                                <span asp-validation-for="Category.Name" class="text-danger"></span>
+                            </div>
 
-                <div class="form-group col-md-4">
-                    <label asp-for="Category.Description" class="control-label"></label>
-                    <input asp-for="Category.Description" class="form-control" />
-                    <span asp-validation-for="Category.Description" class="text-danger"></span>
-                </div>
+                            <div class="form-group col-md-4 mb-3">
+                                <label asp-for="Category.Description" class="control-label"></label>
+                                <input asp-for="Category.Description" class="form-control" />
+                                <span asp-validation-for="Category.Description" class="text-danger"></span>
+                            </div>
 
-                <div class="form-group col-md-4">
-                    <label class="control-label">Image</label>
-                    <input type="file" name="Upload" class="form-control" />
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="form-group">
-                    @if (Model.Category.ImageUrl != null && Model.Category.ImageUrl.Length > 0)
-                    {
-                        <label>Image current</label>
-                        <div class="mt-2">
-                            <img src="@(Model.Category.ImageRenderedUrl)" style="max-width: 200px; max-height: 200px;" />
+                            <div class="form-group col-md-4 mb-3">
+                                <label class="control-label">Hình ảnh</label>
+                                <input type="file" name="Upload" class="form-control" accept="image/*" onchange="previewImage(this)" />
+                            </div>
                         </div>
-                    }
-                    else
-                    {
-                        <label>Please update image</label>
-                    }
+
+                        <div class="row">
+                            <div class="form-group col-md-4 mb-3">
+                                @if (Model.Category.ImageUrl != null && Model.Category.ImageUrl.Length > 0)
+                                {
+                                    <label>Ảnh hiện tại</label>
+                                    <div>
+                                        <img id="preview"
+                                             src="@(Model.Category.ImageRenderedUrl)"
+                                             alt="preview" class="img-thumbnail"
+                                             style="max-width: 100%; height: 150px;" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <label>Cập nhập ảnh</label>
+                                    <img id="preview"
+                                            src="https://placehold.co/300x200/E8F5E8/7cb342?text=Chọn+ảnh"
+                                            alt="preview"
+                                            class="img-thumbnail"
+                                            style="max-width: 100%; height: 150px;" />
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" value="Lưu" class="btn btn-primary" />
+                            <a class="btn btn-secondary" asp-page="./Index">Quay lại</a>
+                            <a class="btn btn-danger" onclick="resetImage()">Xóa ảnh</a>
+                        </div>
+                    </form>
+
                 </div>
             </div>
-            
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a class="btn btn-secondary" asp-page="./Index">Back to List</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/previewimage/preview-image.js"></script>
 }
