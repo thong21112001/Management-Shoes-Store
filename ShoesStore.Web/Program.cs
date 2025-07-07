@@ -1,4 +1,4 @@
-﻿using ShoesStore.Application.Common.Mapping;
+﻿using ShoesStore.Application;
 using ShoesStore.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,10 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 // Gọi phương thức mở rộng để đăng ký DI từ các project khác
+builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Đăng ký AutoMapper
-builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
 var app = builder.Build();
 

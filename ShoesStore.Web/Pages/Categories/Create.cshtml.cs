@@ -1,31 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using ShoesStore.Application.Common.Interfaces;
 using ShoesStore.Application.Common.Models;
-using ShoesStore.Domain.Entities.Data;
+using ShoesStore.Application.Features.Categories.Commands.CreateCategory;
 
 namespace ShoesStore.Web.Pages.Categories
 {
     public class CreateModel : PageModel
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IMediator _mediator;
 
-        public CreateModel(ICategoryRepository categoryRepository)
+        [BindProperty]
+        public CreateCategoryCommand CategoryCommand { get; set; } = new();
+
+        [BindProperty]
+        public IFormFile? Upload { get; set; }
+
+
+
+        public CreateModel(IMediator mediator)
         {
-            _categoryRepository = categoryRepository;
+            _mediator = mediator;
         }
+
+
 
         public IActionResult OnGet()
         {
             return Page();
         }
 
-        [BindProperty]
-        public Category Category { get; set; } = new();
 
-        [BindProperty]
-        public IFormFile? Upload { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -39,18 +45,20 @@ namespace ShoesStore.Web.Pages.Categories
                 using (var memoryStream = new MemoryStream())
                 {
                     await Upload.CopyToAsync(memoryStream);
-                    Category.ImageUrl = memoryStream.ToArray();
+                    CategoryCommand.ImageUrl = memoryStream.ToArray();
                 }
             }
 
-            TempData.Clear(); // nếu cần reset
+            await _mediator.Send(CategoryCommand);
+
+            TempData.Clear();
             var list = new List<AlertMessage> {
                 AlertMessage.Success("Tạo mới thành công"),
                 AlertMessage.Info("Bạn có thể tiếp tục thêm")
             };
             TempData["Alerts"] = JsonConvert.SerializeObject(list);
 
-            await _categoryRepository.AddAsync(Category);
+
             return RedirectToPage("./Index");
         }
     }

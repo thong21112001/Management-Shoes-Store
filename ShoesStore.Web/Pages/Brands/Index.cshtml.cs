@@ -1,32 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ShoesStore.Application.Common.Interfaces;
-using ShoesStore.Application.DTOs;
-using ShoesStore.Domain.Entities.Data;
+using ShoesStore.Application.Features.Brands.Commands.DeleteBrand;
+using ShoesStore.Application.Features.Brands.Queries.GetAllBrands;
+using ShoesStore.Application.Features.Brands.Queries.GetBrandByIdQuery;
+using ShoesStore.Application.Features.Brands.Queries.Shared;
 
 namespace ShoesStore.Web.Pages.Brands
 {
     public class IndexModel : PageModel
     {
-        private readonly IBrandRepository _brandRepository;
+        private readonly IMediator _mediator;
+        public List<BrandListDto> Brands { get; set; } = new();
 
-        public IndexModel(IBrandRepository brandRepository)
+
+        public IndexModel(IMediator mediator)
         {
-            _brandRepository = brandRepository;
+            _mediator = mediator;
         }
 
-        public IList<BrandsDto> Brand { get; set; } = default!;
+
 
         public async Task OnGetAsync()
         {
-            if (_brandRepository != null)
-            {
-                Brand = await GetDataAsync();
-            }
-            else
-            {
-                Brand = new List<BrandsDto>();
-            }
+            // Gửi Query để lấy toàn bộ danh sách Brands
+            Brands = await _mediator.Send(new GetAllBrandsQuery());
         }
 
 
@@ -35,54 +33,44 @@ namespace ShoesStore.Web.Pages.Brands
         //Lấy thông tin đẩy lên partial: _DetailsPartial
         public async Task<IActionResult> OnGetDetailsPartial(int id)
         {
-            var br = await GetBrandById(id);
+            var brandDto = await _mediator.Send(new GetBrandByIdQuery { Id = id });
 
-            if (br == null)
+            if (brandDto == null)
                 return NotFound();
 
-            return Partial("_DetailsPartial", br);
+            // Truyền DTO vào Partial View
+            return Partial("_DetailsPartial", brandDto);
         }
 
 
         //Lấy thông tin đẩy lên partial: _DeletePartial
         public async Task<IActionResult> OnGetDeletePartial(int id)
         {
-            var br = await GetBrandById(id);
+            var brandDto = await _mediator.Send(new GetBrandByIdQuery { Id = id });
 
-            if (br == null)
+            if (brandDto == null)
                 return NotFound();
 
-            return Partial("_DeletePartial", br);
+            // Truyền DTO vào Partial View
+            return Partial("_DeletePartial", brandDto);
         }
 
 
         //Tiến hành kiểm tra và xóa
         public async Task<IActionResult> OnPostDeleteBrandAsync(int id)
         {
-            var br = await GetBrandById(id);
-
-            if (br == null)
+            try
             {
-                return new JsonResult(new { success = false, message = "Không tìm thấy dữ liệu cần xóa!" });
+                // Tạo và gửi command, không cần logic kiểm tra tồn tại ở đây
+                // vì logic đó đã nằm trong Command Handler
+                await _mediator.Send(new DeleteBrandCommand { Id = id });
+
+                return new JsonResult(new { success = true });
             }
-
-            await _brandRepository.DeleteAsync(id);
-
-            return new JsonResult(new { success = true });
-        }
-        #endregion
-
-
-
-        #region Viết phương thức xử lý
-        private async Task<Brand?> GetBrandById(int id)
-        {
-            return await _brandRepository.GetBrandByIdAsync(id);
-        }
-
-        private async Task<IList<BrandsDto>> GetDataAsync()
-        {
-            return await _brandRepository.GetAllBrandsAsync();
+            catch (Exception ex) // Bắt các lỗi có thể xảy ra từ lớp Application
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
         }
         #endregion
     }

@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ShoesStore.Application.Common.Interfaces;
+using ShoesStore.Infrastructure.Persistence;
 using ShoesStore.Infrastructure.Persistence.Data;
-using ShoesStore.Infrastructure.Persistence.Repositories;
 
 namespace ShoesStore.Infrastructure
 {
@@ -15,9 +15,8 @@ namespace ShoesStore.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IBrandRepository, BrandRepository>();
-
+            // Đăng ký Unit of Work, sẽ quản lý các repository
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

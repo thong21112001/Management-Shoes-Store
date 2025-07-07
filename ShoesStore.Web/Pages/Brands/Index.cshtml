@@ -29,10 +29,10 @@
                             STT
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.Brand[0].Name)
+                            @Html.DisplayNameFor(model => model.Brands[0].Name)
                         </th>
                         <th class="d-none d-md-table-cell">
-                            @Html.DisplayNameFor(model => model.Brand[0].Description)
+                            @Html.DisplayNameFor(model => model.Brands[0].Description)
                         </th>
                         <th class="no-sort">
                             Thao tác
@@ -40,7 +40,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Brand)
+                    @foreach (var item in Model.Brands)
                     {
                         <tr>
                             <td></td>

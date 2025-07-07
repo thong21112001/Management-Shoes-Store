@@ -1,31 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using ShoesStore.Application.Common.Interfaces;
 using ShoesStore.Application.Common.Models;
-using ShoesStore.Domain.Entities.Data;
+using ShoesStore.Application.Features.Brands.Commands.CreateBrand;
 
 namespace ShoesStore.Web.Pages.Brands
 {
     public class CreateModel : PageModel
     {
-        private readonly IBrandRepository _brandRepository;
+        private readonly IMediator _mediator;
 
-        public CreateModel(IBrandRepository brandRepository)
+        [BindProperty]
+        public CreateBrandCommand BrandCommand { get; set; } = new();
+
+        [BindProperty]
+        public IFormFile? Upload { get; set; }
+
+
+        public CreateModel(IMediator mediator)
         {
-            _brandRepository = brandRepository;
+            _mediator = mediator;
         }
+
+
 
         public IActionResult OnGet()
         {
             return Page();
         }
 
-        [BindProperty]
-        public Brand Brand { get; set; } = default!;
-
-        [BindProperty]
-        public IFormFile? Upload { get; set; }
 
 
         public async Task<IActionResult> OnPostAsync()
@@ -40,17 +44,19 @@ namespace ShoesStore.Web.Pages.Brands
                 using (var memoryStream = new MemoryStream())
                 {
                     await Upload.CopyToAsync(memoryStream);
-                    Brand.LogoUrl = memoryStream.ToArray();
+                    BrandCommand.LogoUrl = memoryStream.ToArray();
                 }
             }
 
+            // Gửi command đến MediatR để xử lý thêm mới
+            await _mediator.Send(BrandCommand);
+
             TempData.Clear();
             var list = new List<AlertMessage> {
-                AlertMessage.Success("Tạo mới thành công"),
+                AlertMessage.Success("Tạo mới thành công")
             };
             TempData["Alerts"] = JsonConvert.SerializeObject(list);
 
-            await _brandRepository.AddAsync(Brand);
             return RedirectToPage("./Index");
         }
     }

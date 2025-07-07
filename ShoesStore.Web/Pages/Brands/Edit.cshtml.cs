@@ -1,35 +1,50 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ShoesStore.Application.Common.Interfaces;
-using ShoesStore.Domain.Entities.Data;
+using Newtonsoft.Json;
+using ShoesStore.Application.Common.Models;
+using ShoesStore.Application.Features.Brands.Commands.UpdateBrand;
+using ShoesStore.Application.Features.Brands.Queries.GetBrandByIdQuery;
 
 namespace ShoesStore.Web.Pages.Brands
 {
     public class EditModel : PageModel
     {
-        private readonly IBrandRepository _brandRepository;
-
-        public EditModel(IBrandRepository brandRepository)
-        {
-            _brandRepository = brandRepository;
-        }
+        private readonly IMediator _mediator;
 
         [BindProperty]
-        public Brand Brand { get; set; } = default!;
+        public UpdateBrandCommand BrandCommand { get; set; } = new();
 
         [BindProperty]
         public IFormFile? Upload { get; set; }
+
+
+        public EditModel(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null) return NotFound();
 
-            var br = await _brandRepository.GetBrandByIdAsync(id.Value);
-            if (br == null) return NotFound();
+            var brandDto = await _mediator.Send(new GetBrandByIdQuery { Id = id.Value });
 
-            Brand = br;
+            if (brandDto == null)
+            {
+                return NotFound();
+            }
+
+            BrandCommand.Id = brandDto.Id;
+            BrandCommand.Name = brandDto.Name;
+            BrandCommand.Description = brandDto.Description ?? string.Empty;
+            BrandCommand.LogoUrl = brandDto.LogoUrl;
+
             return Page();
         }
+
 
 
         public async Task<IActionResult> OnPostAsync()
@@ -44,11 +59,18 @@ namespace ShoesStore.Web.Pages.Brands
                 using (var memoryStream = new MemoryStream())
                 {
                     await Upload.CopyToAsync(memoryStream);
-                    Brand.LogoUrl = memoryStream.ToArray();
+                    BrandCommand.LogoUrl = memoryStream.ToArray();
                 }
             }
 
-            await _brandRepository.UpdateAsync(Brand);
+            //Gửi Command đã được bind từ form đi để xử lý cập nhật
+            await _mediator.Send(BrandCommand);
+
+            TempData.Clear();
+            var list = new List<AlertMessage> {
+                AlertMessage.Success("Cập nhật thành công")
+            };
+            TempData["Alerts"] = JsonConvert.SerializeObject(list);
 
             return RedirectToPage("./Index");
         }
