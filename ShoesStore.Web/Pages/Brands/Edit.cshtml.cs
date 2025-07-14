@@ -37,10 +37,13 @@ namespace ShoesStore.Web.Pages.Brands
                 return NotFound();
             }
 
-            BrandCommand.Id = brandDto.Id;
-            BrandCommand.Name = brandDto.Name;
-            BrandCommand.Description = brandDto.Description ?? string.Empty;
-            BrandCommand.LogoUrl = brandDto.LogoUrl;
+            BrandCommand = new UpdateBrandCommand
+            {
+                Id = brandDto.Id,
+                Name = brandDto.Name,
+                Description = brandDto.Description ?? string.Empty,
+                LogoUrl = brandDto.LogoUrl
+            };
 
             return Page();
         }

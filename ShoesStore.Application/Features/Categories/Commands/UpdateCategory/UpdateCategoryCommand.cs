@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShoesStore.Application.Features.Categories.Commands.UpdateCategory
 {
@@ -6,9 +7,11 @@ namespace ShoesStore.Application.Features.Categories.Commands.UpdateCategory
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "{0} không được để trống."), Display(Name = "Tên danh mục")]
         public string Name { get; set; } = string.Empty;
 
-        public string Description { get; set; } = string.Empty;
+        [Display(Name = "Mô tả")]
+        public string? Description { get; set; }
 
         public byte[]? ImageUrl { get; set; }
 
