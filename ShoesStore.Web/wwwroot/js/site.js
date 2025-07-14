@@ -137,51 +137,35 @@
         });
     }
 
-    // 5. Tự động mở rộng Sidebar thu gọn khi nhấp vào menu đa cấp
-    const collapseLinks = document.querySelectorAll(
-        '.sidebar .nav-link[data-bs-toggle="collapse"]'
-    );
-    collapseLinks.forEach((link) => {
-        link.addEventListener("click", function (e) {
-            if (body.classList.contains("sidebar-collapsed")) {
-                e.stopImmediatePropagation();
+    // 5. REMOVED: Logic cũ để mở rộng sidebar đã được loại bỏ
+    //    để thay thế bằng hiệu ứng pop-out menu trong CSS.
 
-                localStorage.setItem("sidebarState", "expanded");
-                applySidebarState("expanded");
-
-                const targetCollapse = document.querySelector(
-                    this.getAttribute("href")
-                );
-                setTimeout(() => {
-                    if (targetCollapse) {
-                        new bootstrap.Collapse(targetCollapse, {
-                            toggle: true,
-                        });
-                    }
-                }, 300);
-            }
-        });
-    });
-
-    // 6. Xử lý trạng thái active của menu
+    // 6. Xử lý trạng thái active của menu khi click
     const navLinks = document.querySelectorAll(
         '.sidebar .nav-link:not([data-bs-toggle="collapse"])'
     );
 
     navLinks.forEach((link) => {
         link.addEventListener("click", function () {
-            document
-                .querySelectorAll(".sidebar .nav-link.active")
-                .forEach((l) => l.classList.remove("active"));
-            this.classList.add("active");
+            // Chỉ xử lý khi click vào link con trong menu popout khi sidebar thu gọn
+            if (body.classList.contains('sidebar-collapsed') && this.closest('.collapse')) {
+                // Không cần làm gì thêm, để link điều hướng bình thường
+            } else {
+                // Xử lý active cho các trường hợp khác
+                document
+                    .querySelectorAll(".sidebar .nav-link.active")
+                    .forEach((l) => l.classList.remove("active"));
+                this.classList.add("active");
 
-            const parentCollapse = this.closest(".collapse");
-            if (parentCollapse) {
-                const parentLink = document.querySelector(
-                    `a[href="#${parentCollapse.id}"]`
-                );
-                if (parentLink) parentLink.classList.add("active");
+                const parentCollapse = this.closest(".collapse");
+                if (parentCollapse) {
+                    const parentLink = document.querySelector(
+                        `a[href="#${parentCollapse.id}"]`
+                    );
+                    if (parentLink) parentLink.classList.add("active");
+                }
             }
+
 
             if (window.innerWidth < 992) {
                 hideMobileSidebar();
@@ -189,60 +173,26 @@
         });
     });
 
-    // 7. Tự động highlight menu theo URL thực tế
-    //const currentPath = window.location.pathname.toLowerCase();
+    // 7. Tự động highlight menu theo URL được xử lý bởi server-side (Razor) nên không cần ở đây.
 
-    //document.querySelectorAll('.sidebar .nav-link[href]').forEach((link) => {
-    //    const href = link.getAttribute('href').toLowerCase();
-    //    if (href && currentPath.includes(href)) {
-    //        // Xóa active cũ
-    //        document.querySelectorAll('.sidebar .nav-link.active')
-    //            .forEach((l) => l.classList.remove('active'));
-
-    //        // Thêm active cho link hiện tại
-    //        link.classList.add('active');
-
-    //        // Thêm active cho menu cha nếu có
-    //        const parentCollapse = link.closest('.collapse');
-    //        if (parentCollapse) {
-    //            const parentLink = document.querySelector(
-    //                `a[href="#${parentCollapse.id}"]`
-    //            );
-    //            if (parentLink) parentLink.classList.add('active');
-
-    //            // Mở submenu nếu đang collapsed
-    //            parentCollapse.classList.add('show');
-    //        }
-    //    }
-    //});
-
-    // --- 8. Chuyển trang mượt - CẢI THIỆN ĐỂ KHÔNG BỊ GIẬT ---
-    // Thêm class cho body khi trang load
+    // --- 8. Chuyển trang mượt ---
     document.body.classList.add("fade-in");
 
-    // Xử lý chuyển trang nội bộ
-    document.querySelectorAll("main a[href]:not([target]):not([data-bs-toggle]):not([href^='#']):not([href^='http'])").forEach(link => {
+    document.querySelectorAll("a[href]:not([target]):not([data-bs-toggle]):not([href^='#']):not([href^='http'])").forEach(link => {
         const href = link.getAttribute("href");
         if (href && href !== '#' && !href.startsWith("javascript:")) {
             link.addEventListener("click", function (e) {
-                // Kiểm tra xem link có phải là internal navigation không
                 try {
                     const url = new URL(href, window.location.origin);
-                    if (url.origin === window.location.origin) {
+                    if (url.origin === window.location.origin && url.pathname !== window.location.pathname) {
                         e.preventDefault();
-
-                        // Thêm loading state
-                        document.body.classList.add("page-transitioning");
                         document.body.classList.remove("fade-in");
                         document.body.classList.add("fade-out");
-
-                        // Chờ animation hoàn thành rồi chuyển trang
                         setTimeout(() => {
                             window.location.href = href;
-                        }, 250); // Giảm thời gian để mượt hơn
+                        }, 250);
                     }
                 } catch (error) {
-                    // Nếu có lỗi parse URL, để trình duyệt xử lý bình thường
                     console.warn('Could not parse URL:', href);
                 }
             });
@@ -250,7 +200,6 @@
     });
 
     // --- 9. Khởi tạo lại tables khi cần thiết ---
-    // Observer để theo dõi khi có table mới được thêm vào DOM
     const tableObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.type === 'childList') {
@@ -267,7 +216,6 @@
         });
     });
 
-    // Bắt đầu observe
     tableObserver.observe(document.body, {
         childList: true,
         subtree: true
@@ -281,8 +229,6 @@
     // --- Final adjustment sau khi DOM hoàn toàn ready ---
     setTimeout(() => {
         adjustTables();
-
-        // Remove any lingering transition classes
         document.body.classList.remove("page-transitioning", "fade-out");
         if (!document.body.classList.contains("fade-in")) {
             document.body.classList.add("fade-in");
