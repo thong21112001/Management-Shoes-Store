@@ -10,11 +10,6 @@ public partial class Brand
 
     public byte[]? LogoUrl { get; set; }
 
-    public string? ImageRenderedUrl =>
-            LogoUrl != null
-            ? $"data:image;base64,{Convert.ToBase64String(LogoUrl)}"
-            : "https://placehold.co/650x350/E8F5E8/7cb342?text=Featured+Article";
-
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }

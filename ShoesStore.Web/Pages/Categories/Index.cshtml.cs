@@ -1,32 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ShoesStore.Application.Common.Interfaces;
-using ShoesStore.Application.DTOs;
-using ShoesStore.Domain.Entities.Data;
+using ShoesStore.Application.Features.Categories.Commands.DeleteCategory;
+using ShoesStore.Application.Features.Categories.Queries.GetAllCates;
+using ShoesStore.Application.Features.Categories.Queries.GetCatesByIdQuery;
+using ShoesStore.Application.Features.Categories.Queries.Shared;
 
 namespace ShoesStore.Web.Pages.Categories
 {
     public class IndexModel : PageModel
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IMediator _mediator;
+        public List<CategoriesListDto> Categories { get; set; } = new();
 
-        public IndexModel(ICategoryRepository category)
+
+        public IndexModel(IMediator mediator)
         {
-            _categoryRepository = category;
+            _mediator = mediator;
         }
 
-        public IList<CategoriesDto> Categories { get; set; } = default!;
+
 
         public async Task OnGetAsync()
         {
-            if (_categoryRepository != null)
-            {
-                Categories = await GetDataAsync();
-            }
-            else
-            {
-                Categories = new List<CategoriesDto>();
-            }
+            Categories = await _mediator.Send(new GetAllCatesQuery());
         }
 
 
@@ -35,54 +32,40 @@ namespace ShoesStore.Web.Pages.Categories
         //Lấy thông tin đẩy lên partial: _DetailsPartial
         public async Task<IActionResult> OnGetDetailsPartial(int id)
         {
-            var cate = await GetCategoryById(id);
+            var cateDto = await _mediator.Send(new GetCatesByIdQuery { Id = id });
 
-            if (cate == null)
+            if (cateDto == null)
                 return NotFound();
 
-            return Partial("_DetailsPartial", cate);
+            return Partial("_DetailsPartial", cateDto);
         }
 
 
         //Lấy thông tin đẩy lên partial: _DeletePartial
         public async Task<IActionResult> OnGetDeletePartial(int id)
         {
-            var cate = await GetCategoryById(id);
+            var cateDto = await _mediator.Send(new GetCatesByIdQuery { Id = id });
 
-            if (cate == null)
+            if (cateDto == null)
                 return NotFound();
 
-            return Partial("_DeletePartial", cate);
+            return Partial("_DeletePartial", cateDto);
         }
 
 
         //Tiến hành kiểm tra và xóa
         public async Task<IActionResult> OnPostDeleteCategoryAsync(int id)
         {
-            var cate = await GetCategoryById(id);
-
-            if (cate == null)
+            try
             {
-                return new JsonResult(new { success = false, message = "Không tìm thấy dữ liệu cần xóa!" });
+                await _mediator.Send(new DeleteCategoryCommand { Id = id });
+
+                return new JsonResult(new { success = true });
             }
-
-            await _categoryRepository.DeleteAsync(id);
-
-            return new JsonResult(new { success = true });
-        }
-        #endregion
-
-
-
-        #region Viết phương thức xử lý
-        private async Task<Category?> GetCategoryById(int id)
-        {
-            return await _categoryRepository.GetByIdAsync(id);
-        }
-
-        private async Task<IList<CategoriesDto>> GetDataAsync()
-        {
-            return await _categoryRepository.GetAllAsync();
+            catch (Exception ex) // Bắt các lỗi có thể xảy ra từ lớp Application
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
         }
         #endregion
     }
