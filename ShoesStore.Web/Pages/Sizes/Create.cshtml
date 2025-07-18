@@ -1,0 +1,56 @@
+﻿@page
+@model ShoesStore.Web.Pages.Sizes.CreateModel
+
+@{
+    ViewData["Title"] = "Tạo mới";
+}
+
+
+@section Styles {
+    <link href="~/css/spinnerload/waitingload.css" rel="stylesheet" />
+}
+
+<div class="content-section">
+    <h3>Tạo mới kích thước</h3>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="createForm" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="form-group col-md-3 mb-3">
+                                <label asp-for="SizeCommand.Value" class="control-label"></label><span style="color:red">&nbsp*</span>
+                                <input asp-for="SizeCommand.Value" class="form-control" />
+                                <span asp-validation-for="SizeCommand.Value" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group col-md-3 mb-3">
+                                <label asp-for="SizeCommand.Type" class="control-label"></label>
+                                <input asp-for="SizeCommand.Type" class="form-control" />
+                                <span asp-validation-for="SizeCommand.Type" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input id="submitBtn" type="submit" value="Tạo mới" class="btn btn-primary" />
+                            <a class="btn btn-secondary" asp-page="Index">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loader Overlay -->
+<div id="loaderOverlay" style="display: none;">
+    <span class="loader"></span>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/spinnerloadjs/createsubmitformload.js"></script>
+}

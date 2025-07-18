@@ -59,7 +59,7 @@
 
         @{
             // Xác định xem menu "Quản lý sản phẩm" có nên active và mở rộng hay không
-            var isProductsParentActive = IsParentActive("/brands", "/categories");
+            var isProductsParentActive = IsParentActive("/brands", "/categories", "/sizes");
         }
         <li class="nav-item">
             <a class="nav-link @(isProductsParentActive ? "active" : "")" href="#productsCollapse" data-bs-toggle="collapse" role="button"
@@ -80,6 +80,12 @@
                         <a class="nav-link @(IsActive("/categories") ? "active" : "")" href="/Categories/Index" title="Danh mục giày">
                             <i class="fa-solid fa-angle-right"></i>
                             <span class="nav-link-text">Danh mục giày</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(IsActive("/sizes") ? "active" : "")" href="/Sizes/Index" title="Danh mục kích thước">
+                            <i class="fa-solid fa-angle-right"></i>
+                            <span class="nav-link-text">Danh mục kích thước</span>
                         </a>
                     </li>
                 </ul>
