@@ -1,5 +1,6 @@
 ﻿using ShoesStore.Application;
 using ShoesStore.Infrastructure;
+using ShoesStore.Infrastructure.Persistence.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,21 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 
 var app = builder.Build();
+
+//Seed dữ liệu mặc định vào cơ sở dữ liệu
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        await DataSeeder.SeedAsync(services);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Có lỗi khi tạo dữ liệu mặc định: {ex.Message}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
