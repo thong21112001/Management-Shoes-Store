@@ -1,0 +1,76 @@
+﻿@page
+@model ShoesStore.Web.Pages.Colors.CreateModel
+
+@{
+    ViewData["Title"] = "Tạo mới";
+}
+
+@section Styles {
+    <link href="~/css/spinnerload/waitingload.css" rel="stylesheet" />
+
+    <!-- Pickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/classic.min.css" />
+
+    <style>
+        .color-picker-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+}
+
+<div class="content-section">
+    <h3>Tạo mới mã màu</h3>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="createForm" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="form-group col-md-4 mb-3">
+                                <label asp-for="ColorCommand.Name" class="control-label"></label><span style="color:red">&nbsp*</span>
+                                <input asp-for="ColorCommand.Name" class="form-control" />
+                                <span asp-validation-for="ColorCommand.Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group col-md-4 mb-3">
+                                <label asp-for="ColorCommand.Hexcode" class="control-label"></label><span style="color:red">&nbsp*</span>
+                                <input asp-for="ColorCommand.Hexcode" class="form-control" />
+                                <span asp-validation-for="ColorCommand.Hexcode" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group col-md-4 mb-3">
+                                <label class="control-label">Chọn màu tự động</label>
+                                <div id="color-picker-btn" class="color-picker-btn"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input id="submitBtn" type="submit" value="Tạo mới" class="btn btn-primary" />
+                            <a class="btn btn-secondary" asp-page="Index">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loader Overlay -->
+<div id="loaderOverlay" style="display: none;">
+    <span class="loader"></span>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/spinnerloadjs/createsubmitformload.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@simonwep/pickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nearest-color@0.4.4/nearestColor.min.js"></script>
+    <script src="~/js/pickrcolor/pickr.js"></script>
+}

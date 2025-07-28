@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ShoesStore.Application.Features.Brands.Queries.Shared;
 using ShoesStore.Application.Features.Categories.Queries.Shared;
+using ShoesStore.Application.Features.Colors.Queries.Shared;
 using ShoesStore.Application.Features.Sizes.Queries.Shared;
 using ShoesStore.Domain.Entities.Data;
 
@@ -21,6 +22,10 @@ namespace ShoesStore.Application.Common.Mapping
             // Size
             CreateMap<Size, SizeDto>().ReverseMap();
             CreateMap<Size, SizesListDto>();// dành cho list index
+
+            // Color
+            CreateMap<Color, ColorDto>().ReverseMap();
+            CreateMap<Color, ColorListDto>();// dành cho list index
         }
     }
 }

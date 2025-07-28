@@ -59,7 +59,7 @@
 
         @{
             // Xác định xem menu "Quản lý sản phẩm" có nên active và mở rộng hay không
-            var isProductsParentActive = IsParentActive("/brands", "/categories", "/sizes");
+            var isProductsParentActive = IsParentActive("/brands", "/categories", "/sizes", "/colors");
         }
         <li class="nav-item">
             <a class="nav-link @(isProductsParentActive ? "active" : "")" href="#productsCollapse" data-bs-toggle="collapse" role="button"
@@ -86,6 +86,12 @@
                         <a class="nav-link @(IsActive("/sizes") ? "active" : "")" href="/Sizes/Index" title="Danh mục kích thước">
                             <i class="fa-solid fa-angle-right"></i>
                             <span class="nav-link-text">Danh mục kích thước</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(IsActive("/colors") ? "active" : "")" href="/Colors/Index" title="Danh mục màu sắc">
+                            <i class="fa-solid fa-angle-right"></i>
+                            <span class="nav-link-text">Danh mục màu sắc</span>
                         </a>
                     </li>
                 </ul>
