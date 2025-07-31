@@ -1,0 +1,196 @@
+﻿@page
+@model ShoesStore.Web.Pages.Products.EditModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa Sản phẩm";
+}
+
+@section Styles {
+    <style>
+        .variant-row {
+            border: 1px solid #dee2e6;
+            border-radius: .375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        .variant-image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: .25rem;
+        }
+    </style>
+}
+
+<div class="content-section">
+    <h3>@ViewData["Title"]</h3>
+
+    <form method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ProductCommand.Id" />
+
+        <!-- THÔNG TIN SẢN PHẨM CHÍNH -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header">
+                <h6>Thông tin sản phẩm chung</h6>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label asp-for="ProductCommand.Name" class="control-label"></label><span class="text-danger">&nbsp*</span>
+                        <input asp-for="ProductCommand.Name" class="form-control" />
+                        <span asp-validation-for="ProductCommand.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label asp-for="ProductCommand.BrandId" class="control-label"></label><span class="text-danger">&nbsp*</span>
+                        @* <select asp-for="ProductCommand.BrandId" class="form-control" asp-items="Model.Brands">
+                            <option value="">-- Chọn thương hiệu --</option>
+                        </select> *@
+                        <select id="productBrandId" asp-for="ProductCommand.BrandId" class="form-control form-select select2 w-100" asp-items="Model.Brands"></select>
+                        <span asp-validation-for="ProductCommand.BrandId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-12 mb-3">
+                        <label asp-for="ProductCommand.Description" class="control-label"></label>
+                        <textarea asp-for="ProductCommand.Description" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-6 mb-3">
+                        <label class="control-label">Ảnh sản phẩm</label>
+                        <input asp-for="MainImageUpload" class="form-control" accept="image/*" onchange="previewImage(this, 'main-image-preview')" />
+                        @if (Model.ProductCommand.MainImageUrl != null && Model.ProductCommand.MainImageUrl.Length > 0)
+                        {
+                            <img id="main-image-preview" src="data:image;base64,@(Convert.ToBase64String(Model.ProductCommand.MainImageUrl))" 
+                                alt="current" class="img-thumbnail mt-2" style="max-height: 150px;" />
+                        }
+                        <img id="main-image-preview" src="https://placehold.co/150x150/E8F5E8/7cb342?text=Ảnh+mới+?" alt="preview" class="img-thumbnail mt-2" style="max-height: 150px;" />
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label asp-for="ProductCommand.CategoryIds" class="control-label"></label>
+                        @* <select asp-for="ProductCommand.CategoryIds" class="form-control" asp-items="Model.Categories" multiple="multiple"></select> *@
+                        <select id="productCategoryIds" asp-for="ProductCommand.CategoryIds" class="form-control select2" asp-items="Model.Categories" multiple="multiple"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CÁC BIẾN THỂ SẢN PHẨM -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6>Các biến thể sản phẩm</h6>
+                <button type="button" id="add-variant-btn" class="btn btn-sm btn-success">
+                    <i class="fas fa-plus"></i> Thêm
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="variant-container">
+                    <!-- HIỂN THỊ CÁC BIẾN THỂ ĐÃ CÓ -->
+                    @for (var i = 0; i < Model.ProductCommand.Variants.Count; i++)
+                    {
+                        var imageBytes = Model.ProductCommand.Variants[i].ImageUrl;
+                        var renderedImageUrl = imageBytes != null && imageBytes.Length > 0
+                                                ? $"data:image;base64,{Convert.ToBase64String(imageBytes)}"
+                                                : "https://placehold.co/100x100/EFEFEF/A0A0A0?text=Ảnh";
+
+                        <div class="variant-row">
+                            <input type="hidden" asp-for="ProductCommand.Variants[i].Id" />
+                            <input type="hidden" asp-for="ProductCommand.Variants[i].ImageUrl" />
+                            <button type="button" class="btn-close float-end" aria-label="Close" onclick="removeVariant(this)"></button>
+
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Màu sắc</label>
+                                    <select asp-for="ProductCommand.Variants[i].ColorId" class="form-select" asp-items="Model.Colors" required></select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Kích cỡ</label>
+                                    <select asp-for="ProductCommand.Variants[i].SizeId" class="form-select" asp-items="Model.Sizes" required></select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Giá (VNĐ)</label>
+                                    <input type="number" asp-for="ProductCommand.Variants[i].Price" class="form-control" step="1000" min="0" required />
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Số lượng tồn kho</label>
+                                    <input type="number" asp-for="ProductCommand.Variants[i].StockQuantity" class="form-control" min="0" required />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ảnh cho biến thể (chọn để thay đổi)</label>
+                                    <input type="file" asp-for="ProductCommand.Variants[i].ImageFile" class="form-control" accept="image/*" onchange="previewImage(this, 'variant-preview-@i')" />
+                                </div>
+                                <div class="col-md-6">
+                                    <img id="variant-preview-@i" src="@renderedImageUrl" alt="variant preview" class="variant-image-preview" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <!-- Các dòng biến thể mới sẽ được thêm vào đây bằng JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <input id="submitBtn" type="submit" value="Lưu" class="btn btn-primary" />
+            <a class="btn btn-secondary" asp-page="Index">Quay lại</a>
+        </div>
+    </form>
+</div>
+
+<!-- TEMPLATE CHO MỘT DÒNG BIẾN THỂ - SẼ BỊ ẨN ĐI -->
+<div id="variant-template" style="display: none;">
+    <div class="variant-row">
+        <input type="hidden" name="ProductCommand.Variants[__INDEX__].Id" value="0" />
+        <button type="button" class="btn-close float-end" aria-label="Close" onclick="removeVariant(this)"></button>
+
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Màu sắc</label>
+                <select name="ProductCommand.Variants[__INDEX__].ColorId" class="form-select" asp-items="Model.Colors" required>
+                    <option value="">-- Chọn màu --</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Kích cỡ</label>
+                <select name="ProductCommand.Variants[__INDEX__].SizeId" class="form-select" asp-items="Model.Sizes" required>
+                    <option value="">-- Chọn size --</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Giá (VNĐ)</label>
+                <input type="number" name="ProductCommand.Variants[__INDEX__].Price" class="form-control" step="1000" min="0" required />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Số lượng tồn kho</label>
+                <input type="number" name="ProductCommand.Variants[__INDEX__].StockQuantity" class="form-control" min="0" required />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Ảnh cho biến thể (tùy chọn)</label>
+                <input type="file" name="ProductCommand.Variants[__INDEX__].ImageFile" class="form-control" accept="image/*" onchange="previewImage(this, 'variant-preview-__INDEX__')" />
+            </div>
+            <div class="col-md-6">
+                <img id="variant-preview-__INDEX__" src="https://placehold.co/100x100/EFEFEF/A0A0A0?text=Ảnh" alt="variant preview" class="variant-image-preview" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/pages/products/edit-product.js"></script>
+    <script src="~/js/pages/products/mutiplechoice-select2.js"></script>
+}

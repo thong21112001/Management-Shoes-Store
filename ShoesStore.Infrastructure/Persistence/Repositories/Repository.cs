@@ -41,5 +41,18 @@ namespace ShoesStore.Infrastructure.Persistence.Repositories
             _context.Set<TEntity>().Remove(entity);
             return Task.CompletedTask;
         }
+
+        // THÊM MỚI: Triển khai DeleteRangeAsync
+        public Task DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            _context.Set<TEntity>().RemoveRange(entities);
+            return Task.CompletedTask;
+        }
+
+        // THÊM MỚI: Triển khai GetQueryable
+        public IQueryable<TEntity> GetQueryable()
+        {
+            return _context.Set<TEntity>();
+        }
     }
 }

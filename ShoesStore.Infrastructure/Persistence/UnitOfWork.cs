@@ -1,4 +1,5 @@
-﻿using ShoesStore.Application.Common.Interfaces;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using ShoesStore.Application.Common.Interfaces;
 using ShoesStore.Infrastructure.Persistence.Data;
 using ShoesStore.Infrastructure.Persistence.Repositories;
 using System.Collections;
@@ -9,6 +10,7 @@ namespace ShoesStore.Infrastructure.Persistence
     {
         private readonly ApplicationDbContext _context;
         private Hashtable _repositories;
+        private IDbContextTransaction? _transaction; // THÊM MỚI
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -40,6 +42,37 @@ namespace ShoesStore.Infrastructure.Persistence
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        // THÊM MỚI: Triển khai các phương thức Transaction
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        }
+
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+                if (_transaction != null)
+                {
+                    await _transaction.CommitAsync(cancellationToken);
+                }
+            }
+            catch
+            {
+                await RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+        }
+
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync(cancellationToken);
+            }
         }
 
         public void Dispose()

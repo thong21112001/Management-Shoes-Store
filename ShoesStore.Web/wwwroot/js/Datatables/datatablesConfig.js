@@ -10,7 +10,7 @@
             scrollCollapse: true,
             pagingType: "full_numbers",
             language: {
-                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json",
+                url: "/data/i18n/vndatatables.json",
                 paginate: {
                     first: '<i class="fa fa-angle-double-left"></i>',
                     previous: '<i class="fa fa-angle-left"></i>',

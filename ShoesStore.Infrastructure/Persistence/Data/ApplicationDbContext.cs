@@ -115,7 +115,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductCategories)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_ProductCategories_Products");
         });
 
@@ -145,7 +145,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductVariants)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_ProductVariants_Products");
 
             entity.HasOne(d => d.Size).WithMany(p => p.ProductVariants)

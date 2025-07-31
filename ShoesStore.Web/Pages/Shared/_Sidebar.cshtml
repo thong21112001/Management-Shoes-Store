@@ -1,18 +1,19 @@
 ﻿@functions {
-    // Hàm kiểm tra xem một link có đang active hay không.
-    // page: đường dẫn cần kiểm tra (ví dụ: "/categories").
-    // exact: nếu true, chỉ khớp chính xác; nếu false, khớp cả đường dẫn con (mặc định).
+    // [CẢI TIẾN] Hàm kiểm tra link active đã được làm gọn và xử lý tốt hơn.
+    // page: đường dẫn cần kiểm tra (vídụ: "/categories").
+    // exact: nếu true, chỉ khớp chính xác; nếu false, khớp cả đường dẫn con.
     bool IsActive(string page, bool exact = false)
     {
         var currentPath = Context.Request.Path.Value?.ToLowerInvariant() ?? "/";
         var matchPath = page.ToLowerInvariant();
 
-        // Xử lý trường hợp đặc biệt cho trang chủ
-        if (matchPath == "/index" || matchPath == "/")
+        // Xử lý trường hợp đặc biệt cho trang chủ ("/") để nó không khớp với mọi trang khác
+        if (matchPath == "/")
         {
-            return currentPath == "/" || currentPath == "/index";
+            return currentPath == "/";
         }
 
+        // Nếu so khớp chính xác
         if (exact)
         {
             return currentPath == matchPath;
@@ -30,6 +31,7 @@
         foreach (var page in pages)
         {
             var matchPath = page.ToLowerInvariant();
+            // Bỏ qua các chuỗi rỗng hoặc chỉ là "/"
             if (string.IsNullOrEmpty(matchPath) || matchPath == "/") continue;
 
             if (currentPath.StartsWith(matchPath))
@@ -51,24 +53,33 @@
 
     <ul class="nav flex-column flex-grow-1 mt-3">
         <li class="nav-item">
+            @* [SỬA LỖI] Sử dụng IsActive("/", exact: true) để chỉ active đúng trang chủ *@
             <a class="nav-link @(IsActive("/", exact: true) ? "active" : "")" href="/">
                 <i class="fa-solid fa-chart-pie"></i>
                 <span class="nav-link-text">Bảng điều khiển</span>
             </a>
         </li>
 
+        <li class="nav-item">
+            @* [SỬA LỖI] Sửa điều kiện active cho trang Sản phẩm. Nó sẽ active cho /products, /products/index, /products/edit... *@
+            <a class="nav-link @(IsActive("/products") ? "active" : "")" href="/Products/Index" title="Sản phẩm">
+                <i class="fa-solid fa-section"></i>
+                <span class="nav-link-text">Sản phẩm</span>
+            </a>
+        </li>
+
         @{
-            // Xác định xem menu "Quản lý sản phẩm" có nên active và mở rộng hay không
-            var isProductsParentActive = IsParentActive("/brands", "/categories", "/sizes", "/colors");
+            // Xác định xem menu "Quản lý" có nên active và mở rộng hay không
+            var isManagementParentActive = IsParentActive("/brands", "/categories", "/sizes", "/colors");
         }
         <li class="nav-item">
-            <a class="nav-link @(isProductsParentActive ? "active" : "")" href="#productsCollapse" data-bs-toggle="collapse" role="button"
-               aria-expanded="@(isProductsParentActive ? "true" : "false")" aria-controls="productsCollapse">
+            <a class="nav-link @(isManagementParentActive ? "active" : "")" href="#productsCollapse" data-bs-toggle="collapse" role="button"
+               aria-expanded="@(isManagementParentActive ? "true" : "false")" aria-controls="productsCollapse">
                 <i class="fa-solid fa-box-archive"></i>
                 <span class="nav-link-text">Quản lý</span>
             </a>
 
-            <div class="collapse @(isProductsParentActive ? "show" : "")" id="productsCollapse">
+            <div class="collapse @(isManagementParentActive ? "show" : "")" id="productsCollapse">
                 <ul class="nav flex-column nav-submenu">
                     <li class="nav-item">
                         <a class="nav-link @(IsActive("/brands") ? "active" : "")" href="/Brands/Index" title="Thương hiệu giày">
