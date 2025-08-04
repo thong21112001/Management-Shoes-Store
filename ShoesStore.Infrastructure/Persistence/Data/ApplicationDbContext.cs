@@ -96,7 +96,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Brand).WithMany(p => p.Products)
                 .HasForeignKey(d => d.BrandId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Ngăn chặn xóa thương hiệu nếu có sản phẩm liên kết
                 .HasConstraintName("FK_Products_Brands");
         });
 
@@ -110,7 +110,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Category).WithMany(p => p.ProductCategories)
                 .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)  // Ngăn chặn xóa danh mục nếu có sản phẩm liên kết
                 .HasConstraintName("FK_ProductCategories_Categories");
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductCategories)
@@ -140,7 +140,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Color).WithMany(p => p.ProductVariants)
                 .HasForeignKey(d => d.ColorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)  // Ngăn chặn xóa màu sắc nếu có sản phẩm liên kết
                 .HasConstraintName("FK_ProductVariants_Colors");
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductVariants)
@@ -150,7 +150,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Size).WithMany(p => p.ProductVariants)
                 .HasForeignKey(d => d.SizeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)  // Ngăn chặn xóa kích thước nếu có sản phẩm liên kết
                 .HasConstraintName("FK_ProductVariants_Sizes");
         });
 
