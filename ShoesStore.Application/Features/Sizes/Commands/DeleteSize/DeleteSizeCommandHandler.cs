@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShoesStore.Application.Common.Interfaces;
 using ShoesStore.Domain.Entities.Data;
@@ -19,28 +20,30 @@ namespace ShoesStore.Application.Features.Sizes.Commands.DeleteSize
 
         public async Task<Unit> Handle(DeleteSizeCommand request, CancellationToken cancellationToken)
         {
-            try
+            var sizeDb = await _unitOfWork.Repository<Size>().GetByIdAsync(request.Id);
+            var prodVarRepo = _unitOfWork.Repository<ProductVariant>();
+
+            var isHadProdVar = await prodVarRepo.GetQueryable()
+                .AnyAsync(pv => pv.SizeId == request.Id, cancellationToken);
+
+            if (isHadProdVar)
             {
-                var sizeDb = await _unitOfWork.Repository<Size>().GetByIdAsync(request.Id);
-
-                if (sizeDb == null)
-                {
-                    throw new KeyNotFoundException($"Size with ID {request.Id} not found.");
-                }
-
-                await _unitOfWork.Repository<Size>().DeleteAsync(sizeDb, cancellationToken);
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _logger.LogInformation("Xóa kích thước thành công với id: {Id}", request.Id);
-
-                return Unit.Value;
+                // Nếu đang được sử dụng, ném ra một ngoại lệ với thông báo rõ ràng.
+                throw new InvalidOperationException("Không thể xóa size này vì đang có sản phẩm sử dụng.");
             }
-            catch (Exception ex)
+
+            if (sizeDb == null)
             {
-                _logger.LogError(ex, "Lỗi khi xóa kích thước với id: {Id}", request.Id);
-                throw new ApplicationException("Lỗi khi xóa kích thước", ex);
+                throw new KeyNotFoundException($"Size với id {request.Id} không tồn tại.");
             }
+
+            await _unitOfWork.Repository<Size>().DeleteAsync(sizeDb, cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Xóa kích thước thành công với id: {Id}", request.Id);
+
+            return Unit.Value;
         }
     }
 }
