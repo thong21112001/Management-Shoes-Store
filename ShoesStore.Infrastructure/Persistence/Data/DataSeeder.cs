@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ShoesStore.Domain.Entities.Data;
+using IdentityApplicationUser = ShoesStore.Domain.Entities.ApplicationUser;
 
 namespace ShoesStore.Infrastructure.Persistence.Data
 {
@@ -9,12 +12,16 @@ namespace ShoesStore.Infrastructure.Persistence.Data
         // Làm await tránh deadlock trong quá trình khởi tạo dữ liệu
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                await context.Database.EnsureCreatedAsync();
-                await CreateDataBase(context);
-            }
+            using var scope = serviceProvider.CreateScope();
+            var sp = scope.ServiceProvider;
+
+            var db = sp.GetRequiredService<ApplicationDbContext>();
+
+            // DÙNG MIGRATIONS thay vì EnsureCreated (đúng bài EF Core)
+            await db.Database.MigrateAsync();
+
+            // seed data cơ bản
+            await CreateDataBase(db);
         }
 
         private static async Task CreateDataBase(ApplicationDbContext context)
@@ -77,6 +84,49 @@ namespace ShoesStore.Infrastructure.Persistence.Data
             {
                 await context.SaveChangesAsync();
             }
+        }
+
+        public static async Task SeedRolesAndAdminAsync(IServiceProvider services)
+        {
+            using var scope = services.CreateScope();
+            var sp = scope.ServiceProvider;
+
+            var cfg = sp.GetRequiredService<IConfiguration>();
+            var roleMgr = sp.GetRequiredService<RoleManager<IdentityRole<Guid>>>(); // ✅ GUID
+            var userMgr = sp.GetRequiredService<UserManager<IdentityApplicationUser>>();    // ✅ ApplicationUser đúng loại
+
+
+            // Seed Roles
+            string[] roleNames = { "SuperAdmin", "Admin" };
+            foreach (var role in roleNames)
+                if (!await roleMgr.RoleExistsAsync(role))
+                    await roleMgr.CreateAsync(new IdentityRole<Guid>(role));
+
+            // Admin defaults (có thể lấy từ appsettings: Auth:Seed:*)
+            var adminEmail = cfg["Auth:Seed:AdminEmail"] ?? "thongzuka2000@gmail.com";
+            var adminPass = cfg["Auth:Seed:AdminPassword"] ?? "Admin123@";
+            var adminName = cfg["Auth:Seed:AdminFullName"] ?? "System Admin";
+
+            // Seed Admin User
+            var admin = await userMgr.FindByEmailAsync(adminEmail);
+            if (admin is null)
+            {
+                admin = new IdentityApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true,
+                    FullName = adminName
+                };
+                var res = await userMgr.CreateAsync(admin, adminPass);
+                if (!res.Succeeded)
+                    throw new Exception("Create admin failed: " + string.Join(";", res.Errors.Select(e => e.Description)));
+            }
+
+            // Add Admin to Roles
+            var roles = await userMgr.GetRolesAsync(admin);
+            if (!roles.Contains("SuperAdmin"))
+                await userMgr.AddToRolesAsync(admin, new[] { "SuperAdmin" });
         }
     }
 }

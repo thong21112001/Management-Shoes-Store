@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using ShoesStore.Domain.Entities;
 using ShoesStore.Domain.Entities.Data;
 
 namespace ShoesStore.Infrastructure.Persistence.Data;
 
-public partial class ApplicationDbContext : DbContext
+// Sửa đổi: Kế thừa từ IdentityDbContext<ApplicationUser>
+public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    public ApplicationDbContext()
-    {
-    }
-
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
@@ -28,12 +28,12 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Size> Sizes { get; set; }
 
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("Server=.;Database=ShoeStoreDB;Integrated Security=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // BẮT BUỘC: cấu hình Identity tables trước
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Brand>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Brands__3214EC07615B0D54");
