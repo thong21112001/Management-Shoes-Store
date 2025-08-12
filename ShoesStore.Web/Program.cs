@@ -17,6 +17,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    // Cấu hình Serilog
     builder.Host.UseSerilog((ctx, sv, cfg) => cfg
         .ReadFrom.Configuration(ctx.Configuration)
         .ReadFrom.Services(sv)
@@ -26,39 +27,55 @@ try
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructure(builder.Configuration);
 
-    builder.Services.AddAuthorization();
+    // Email sender (generic đúng loại)
+    builder.Services.AddTransient<IEmailSender<IdentityAppUser>, MailKitEmailSender>();
 
-    // ⬇️ Identity API endpoints + Roles (GUID). KHÔNG thêm AddIdentityCookies.
-    builder.Services.AddIdentityApiEndpoints<IdentityAppUser>(opt =>
+    // Bắt buộc để IdentityCookie hoạt động chính xác
+    builder.Services.AddHttpContextAccessor();
+
+    // Cấu hình Identity và API Endpoints TRƯỚC
+    builder.Services.AddIdentityApiEndpoints<IdentityAppUser>(options =>
     {
-        opt.SignIn.RequireConfirmedEmail = true;
-        opt.User.RequireUniqueEmail = true;
-        opt.Lockout.MaxFailedAccessAttempts = 5;
+        options.SignIn.RequireConfirmedEmail = true;
+        options.User.RequireUniqueEmail = true;
     })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-    // Email sender (generic đúng loại)
-    builder.Services.AddTransient<IEmailSender<IdentityAppUser>, MailKitEmailSender>();
-
-    // Google chỉ khi có key (KHÔNG gọi AddIdentityCookies)
-    var gid = builder.Configuration["Authentication:Google:ClientId"];
-    var gsec = builder.Configuration["Authentication:Google:ClientSecret"];
-    if (!string.IsNullOrWhiteSpace(gid) && !string.IsNullOrWhiteSpace(gsec))
+    // Cấu hình Authentication, để login google
+    var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+    var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
     {
-        builder.Services.AddAuthentication().AddGoogle(o =>
-        {
-            o.ClientId = gid!;
-            o.ClientSecret = gsec!;
-            o.SignInScheme = IdentityConstants.ExternalScheme; // external flow
-        });
-        Log.Information("Google OAuth enabled.");
+        builder.Services.AddAuthentication()
+            .AddGoogle(options =>
+            {
+                options.ClientId = googleClientId;
+                options.ClientSecret = googleClientSecret;
+            });
+        Log.Information("Google Authentication được kích hoạt.");
     }
     else
     {
-        Log.Warning("Google OAuth disabled (missing ClientId/ClientSecret).");
+        builder.Services.AddAuthentication();
+        Log.Warning("Google Authentication bị vô hiệu hóa do thiếu ClientId/ClientSecret.");
     }
 
+    // Cấu hình lại Cookie đã được Identity đăng ký
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+        // Chỉ định đường dẫn login cho các trang Razor
+        options.LoginPath = "/Admin/Login";
+        options.LogoutPath = "/Admin/Logout";
+        options.AccessDeniedPath = "/Admin/AccessDenied";
+        options.ReturnUrlParameter = "returnUrl";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+    });
+
+    builder.Services.AddAuthorization();
+
+    // Cấu hình Rate Limiting chống spam
     builder.Services.AddRateLimiter(o =>
     {
         o.AddFixedWindowLimiter("fixed", x =>
@@ -70,11 +87,23 @@ try
         });
     });
 
-    builder.Services.AddRazorPages();
+    // Cấu hình RazorPages với Authorization phù hợp
+    builder.Services.AddRazorPages(options =>
+    {
+        // Bảo vệ tất cả các trang NGOẠI TRỪ những trang được chỉ định
+        options.Conventions.AuthorizeFolder("/");
+
+        // Cho phép truy cập anonymous đến các trang auth
+        options.Conventions.AllowAnonymousToPage("/Admin/Login");
+        options.Conventions.AllowAnonymousToPage("/Admin/Register");
+        options.Conventions.AllowAnonymousToPage("/Admin/ForgotPassword");
+        options.Conventions.AllowAnonymousToPage("/Admin/ResetPassword");
+        options.Conventions.AllowAnonymousToPage("/Error");
+    });
 
     var app = builder.Build();
 
-    // Seed (đã fix generic ở bước B dưới)
+    // Seed dữ liệu vào DB
     using (var scope = app.Services.CreateScope())
     {
         var sv = scope.ServiceProvider;
@@ -97,9 +126,10 @@ try
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
-    app.UseRouting();
 
+    app.UseRouting();
     app.UseRateLimiter();
+
     app.UseAuthentication();
     app.UseAuthorization();
 
@@ -108,6 +138,20 @@ try
        .MapIdentityApi<IdentityAppUser>();
 
     app.MapRazorPages();
+
+    app.MapGet("/", context =>
+    {
+        if (!(context.User?.Identity?.IsAuthenticated ?? false))
+        {
+            context.Response.Redirect("/Admin/Login");
+        }
+        else
+        {
+            context.Response.Redirect("/Index");
+        }
+        return Task.CompletedTask;
+    });
+
     app.Run();
 }
 catch (Exception ex)
