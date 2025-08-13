@@ -39,15 +39,6 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
         const data = await resp.json().catch(() => ({}));
         let msg = data.detail || data.message || 'Đăng nhập thất bại';
 
-        // Logic suy đoán từ phản hồi mặc định
-        if (msg.includes("locked out")) {
-            msg = "Tài khoản đã bị khóa do đăng nhập sai nhiều lần.";
-        } else if (msg.includes("Invalid username or password")) {
-            msg = "Email hoặc mật khẩu không chính xác.";
-        } else if (msg.includes("confirm your email")) {
-            msg = "Vui lòng xác nhận email trước khi đăng nhập.";
-        }
-
         const $err = document.getElementById('err');
         $err.textContent = msg;
         $err.style.display = 'block';

@@ -5,6 +5,7 @@ using ShoesStore.Application;
 using ShoesStore.Infrastructure;
 using ShoesStore.Infrastructure.Persistence.Data;
 using ShoesStore.Web.Services;
+using ShoesStore.Web.WebApi;
 using System.Threading.RateLimiting;
 
 // DÙNG đúng ApplicationUser kế thừa IdentityUser<Guid>
@@ -133,9 +134,8 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    // Map Identity API (dùng CÙNG loại ApplicationUser)
-    app.MapGroup("/api/auth").RequireRateLimiting("fixed")
-       .MapIdentityApi<IdentityAppUser>();
+    // Map đến folder WebApi cho phần auth
+    app.MapGroup("/api/auth").RequireRateLimiting("fixed").MapAuthApi();
 
     app.MapRazorPages();
 
