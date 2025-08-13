@@ -39,6 +39,13 @@ try
     {
         options.SignIn.RequireConfirmedEmail = true;
         options.User.RequireUniqueEmail = true;
+
+        // === CẤU HÌNH MẬT KHẨU Ở ĐÂY ===
+        options.Password.RequiredLength = 8; // Tối thiểu 8 ký tự
+        options.Password.RequireDigit = true; // Bắt buộc có số
+        options.Password.RequireNonAlphanumeric = true; // Bắt buộc có ký tự đặc biệt
+        options.Password.RequireUppercase = true; // Bắt buộc có chữ hoa
+        options.Password.RequireLowercase = true; // Bắt buộc có chữ thường
     })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -67,7 +74,6 @@ try
     {
         // Chỉ định đường dẫn login cho các trang Razor
         options.LoginPath = "/Admin/Login";
-        options.LogoutPath = "/Admin/Logout";
         options.AccessDeniedPath = "/Admin/AccessDenied";
         options.ReturnUrlParameter = "returnUrl";
         options.SlidingExpiration = true;
@@ -97,6 +103,7 @@ try
         // Cho phép truy cập anonymous đến các trang auth
         options.Conventions.AllowAnonymousToPage("/Admin/Login");
         options.Conventions.AllowAnonymousToPage("/Admin/Register");
+        options.Conventions.AllowAnonymousToPage("/Admin/ConfirmEmail");
         options.Conventions.AllowAnonymousToPage("/Admin/ForgotPassword");
         options.Conventions.AllowAnonymousToPage("/Admin/ResetPassword");
         options.Conventions.AllowAnonymousToPage("/Error");

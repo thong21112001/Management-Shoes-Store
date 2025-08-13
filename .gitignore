@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ShoesStore.Web/ShoesStore.Web.csproj
+/ShoesStore.Web/ShoesStore.Web.csproj
+/ShoesStore.Web/appsettings.json
