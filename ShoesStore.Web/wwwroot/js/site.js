@@ -37,13 +37,6 @@
         setTimeout(adjustTables, 350); // Đợi animation hoàn thành
     });
 
-    // --- KHỞI TẠO CÁC THƯ VIỆN ---
-    // 1. Select2
-    $(".select2-single").select2({
-        theme: "bootstrap-5",
-        dropdownParent: $("#addProductModal"),
-    });
-
     // --- LOGIC GIAO DIỆN ---
     const body = document.body;
     const htmlEl = document.documentElement;
@@ -137,10 +130,7 @@
         });
     }
 
-    // 5. REMOVED: Logic cũ để mở rộng sidebar đã được loại bỏ
-    //    để thay thế bằng hiệu ứng pop-out menu trong CSS.
-
-    // 6. Xử lý trạng thái active của menu khi click
+    // 5. Xử lý trạng thái active của menu khi click
     const navLinks = document.querySelectorAll(
         '.sidebar .nav-link:not([data-bs-toggle="collapse"])'
     );
@@ -173,9 +163,7 @@
         });
     });
 
-    // 7. Tự động highlight menu theo URL được xử lý bởi server-side (Razor) nên không cần ở đây.
-
-    // --- 8. Chuyển trang mượt ---
+    // --- 6. Chuyển trang mượt ---
     document.body.classList.add("fade-in");
 
     document.querySelectorAll("a[href]:not([target]):not([data-bs-toggle]):not([href^='#']):not([href^='http'])").forEach(link => {
@@ -199,7 +187,7 @@
         }
     });
 
-    // --- 9. Khởi tạo lại tables khi cần thiết ---
+    // --- 7. Khởi tạo lại tables khi cần thiết ---
     const tableObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.type === 'childList') {
@@ -221,10 +209,42 @@
         subtree: true
     });
 
-    // --- 10. Cleanup khi trang unload ---
+    // --- 8. Cleanup khi trang unload ---
     window.addEventListener('beforeunload', () => {
         tableObserver.disconnect();
     });
+
+    // --- 9. Logout ---
+    const logoutButton = document.getElementById('logoutButton');
+
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async function (event) {
+            event.preventDefault(); // Ngăn thẻ <a> chuyển trang
+
+            // Lấy anti-forgery token để tăng cường bảo mật
+            const afTokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const afToken = afTokenInput ? afTokenInput.value : null;
+
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        // Thêm token vào header nếu có
+                        'RequestVerificationToken': afToken
+                    }
+                });
+
+                if (response.ok) {
+                    window.location.href = '/Admin/Login';
+                } else {
+                    alert('Đăng xuất không thành công. Vui lòng thử lại.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi đăng xuất:', error);
+                alert('Đã xảy ra lỗi kết nối.');
+            }
+        });
+    }
 
     // --- Final adjustment sau khi DOM hoàn toàn ready ---
     setTimeout(() => {

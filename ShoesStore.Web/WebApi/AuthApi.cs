@@ -46,6 +46,13 @@ namespace ShoesStore.Web.WebApi
                 return Results.Ok();
             });
 
+            // /api/auth/logout
+            group.MapPost("/logout", async (SignInManager<ApplicationUser> signInManager) =>
+            {
+                await signInManager.SignOutAsync();
+                return Results.Ok();
+            }).RequireAuthorization(); // Yêu cầu phải đăng nhập mới được logout
+
             return group;
         }
 
